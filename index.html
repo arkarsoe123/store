@@ -1,0 +1,336 @@
+```html
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>ကုန်ပစ္စည်းဈေးနှုန်း</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Prices">
+    
+    <!-- Apple Touch Icon (App Icon အဖြစ်ပေါ်ရန်) -->
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3514/3514491.png">
+    
+    <!-- Dynamic Manifest အတွက် Link -->
+    <link rel="manifest" id="manifest-link" href="">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap');
+        body { font-family: 'Padauk', sans-serif; font-size: 14px; -webkit-tap-highlight-color: transparent; }
+        .modal { transition: opacity 0.2s ease; }
+        body.modal-active { overflow: hidden; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        td { padding: 8px 12px !important; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <nav class="bg-blue-600 text-white shadow-md p-3 sticky top-0 z-20">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="font-bold text-lg flex items-center">
+                <i class="fas fa-box-open mr-2"></i> ဈေးနှုန်းများ
+            </h1>
+            <div class="flex gap-2">
+                <!-- App အဖြစ်သွင်းရန် ခလုတ် (ပထမဆုံးတွင် ဖျောက်ထားမည်) -->
+                <button id="installBtn" class="hidden bg-white/20 text-white px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-white/30 transition flex items-center">
+                    <i class="fas fa-download mr-1.5"></i> App သွင်းမည်
+                </button>
+                <button onclick="toggleModal()" class="bg-white text-blue-600 px-3 py-1.5 rounded-lg text-sm font-bold hover:bg-gray-100 transition flex items-center shadow-sm">
+                    <i class="fas fa-plus mr-1.5"></i> ထည့်ရန်
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto p-3">
+        <div class="flex gap-2 mb-3">
+            <div class="relative flex-1">
+                <input type="text" id="searchInput" placeholder="အမည်ဖြင့် ရှာဖွေပါ..." class="w-full rounded-xl border-gray-200 shadow-sm focus:ring-2 focus:ring-blue-500 border p-2.5 pl-9 outline-none text-sm bg-white">
+                <i class="fas fa-search absolute left-3 top-3.5 text-gray-400"></i>
+            </div>
+            <div id="totalItems" class="bg-white border text-blue-600 text-xs font-bold px-3 py-2.5 rounded-xl flex items-center shadow-sm whitespace-nowrap">
+                ၀ မျိုး
+            </div>
+        </div>
+
+        <div class="mb-3 flex gap-2 overflow-x-auto hide-scrollbar py-1" id="categoryBar"></div>
+
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
+            <!-- Loading Overlay -->
+            <div id="loadingOverlay" class="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10 hidden">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+
+            <table class="min-w-full divide-y divide-gray-100">
+                <thead class="bg-gray-50/80">
+                    <tr class="text-[11px] text-gray-500 uppercase font-bold tracking-wider">
+                        <th class="px-3 py-2.5 text-left">ကုန်ပစ္စည်း</th>
+                        <th class="px-3 py-2.5 text-left hidden sm:table-cell">အမျိုးအစား</th>
+                        <th class="px-3 py-2.5 text-right">ဈေးနှုန်း</th>
+                        <th class="px-3 py-2.5 text-center"></th>
+                    </tr>
+                </thead>
+                <tbody id="productList" class="divide-y divide-gray-100 text-sm"></tbody>
+            </table>
+            
+            <div id="emptyState" class="hidden text-center py-12">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400 text-2xl">
+                    <i class="fas fa-box"></i>
+                </div>
+                <p class="text-gray-500 text-sm" id="emptyStateText">စာရင်းမရှိသေးပါ။</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none modal transition-all duration-200">
+        <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onclick="toggleModal()"></div>
+        <div class="bg-white w-full max-w-xs mx-4 p-5 rounded-2xl shadow-2xl relative z-10 transform transition-transform scale-95" id="modalContent">
+            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                <i class="fas fa-pen-to-square text-blue-500 mr-2"></i> စာရင်းအသစ်
+            </h2>
+            <form id="productForm" class="space-y-3">
+                <input type="text" id="name" required placeholder="ပစ္စည်းအမည်" class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white border p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm">
+                <input type="number" id="price" required placeholder="ဈေးနှုန်း (Ks)" class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white border p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm">
+                <div>
+                    <input list="categories" id="category" required placeholder="အမျိုးအစား" class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white border p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition text-sm">
+                    <datalist id="categories">
+                        <option value="ဆိုင်ကယ်ပစ္စည်း"><option value="စားသောက်ကုန်"><option value="အလှကုန်">
+                    </datalist>
+                </div>
+                <div class="flex gap-2 pt-3">
+                    <button type="button" onclick="toggleModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-xl text-sm transition">ပိတ်မည်</button>
+                    <button type="submit" id="submitBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md shadow-blue-500/30">သိမ်းမည်</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // PWA Manifest ဖန်တီးခြင်း
+        const manifestData = {
+            name: "ကုန်ပစ္စည်းဈေးနှုန်းမှတ်တမ်း",
+            short_name: "Prices",
+            start_url: ".",
+            display: "standalone",
+            background_color: "#f3f4f6",
+            theme_color: "#2563eb",
+            icons: [
+                {
+                    src: "https://cdn-icons-png.flaticon.com/512/3514/3514491.png",
+                    sizes: "512x512",
+                    type: "image/png",
+                    purpose: "any maskable"
+                }
+            ]
+        };
+        const manifestString = JSON.stringify(manifestData);
+        document.getElementById('manifest-link').setAttribute('href', 'data:application/manifest+json;charset=utf-8,' + encodeURIComponent(manifestString));
+
+        // PWA Install Prompt (Android Chrome အတွက်)
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.classList.remove('hidden'); // Install ခလုတ်ကို ပြမည်
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.classList.add('hidden');
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        // -------------------------------------------------
+        // Application Logic (SheetDB)
+        // -------------------------------------------------
+        const SHEETDB_URL = "https://sheetdb.io/api/v1/ko6zugnynd0et"; 
+
+        let products = [];
+        let activeCategory = 'all';
+
+        const productForm = document.getElementById('productForm');
+        const productList = document.getElementById('productList');
+        const searchInput = document.getElementById('searchInput');
+        const totalItems = document.getElementById('totalItems');
+        const emptyState = document.getElementById('emptyState');
+        const categoryBar = document.getElementById('categoryBar');
+        const modal = document.getElementById('modal');
+        const modalContent = document.getElementById('modalContent');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function toggleModal() {
+            modal.classList.toggle('opacity-0');
+            modal.classList.toggle('pointer-events-none');
+            if(modal.classList.contains('opacity-0')){
+                modalContent.classList.remove('scale-100');
+                modalContent.classList.add('scale-95');
+                document.body.classList.remove('modal-active');
+            } else {
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+                document.body.classList.add('modal-active');
+                setTimeout(() => document.getElementById('name').focus(), 100);
+            }
+        }
+
+        const toMyanmarNumber = (num) => {
+            const numbers = {'0':'၀','1':'၁','2':'၂','3':'၃','4':'၄','5':'၅','6':'၆','7':'၇','8':'၈','9':'၉'};
+            return num.toString().replace(/[0-9]/g, match => numbers[match]);
+        };
+
+        // Data ဆွဲယူခြင်း (GET)
+        async function fetchProducts() {
+            loadingOverlay.classList.remove('hidden');
+            try {
+                const response = await fetch(SHEETDB_URL);
+                if(response.ok) {
+                    products = await response.json();
+                    renderCategoryChips();
+                    applyFilters();
+                }
+            } catch (error) {
+                console.error(error);
+            } finally {
+                loadingOverlay.classList.add('hidden');
+            }
+        }
+
+        function renderCategoryChips() {
+            categoryBar.innerHTML = '';
+            const uniqueCategories = [...new Set(products.map(p => p.category))].filter(Boolean);
+            
+            const createChip = (label, value) => {
+                const btn = document.createElement('button');
+                btn.className = `px-4 py-1.5 rounded-full whitespace-nowrap text-xs font-bold transition border ${activeCategory === value ? 'bg-blue-100 text-blue-700 border-blue-200' : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'}`;
+                btn.innerText = label;
+                btn.onclick = () => { activeCategory = value; renderCategoryChips(); applyFilters(); };
+                categoryBar.appendChild(btn);
+            };
+
+            createChip('အားလုံး', 'all');
+            uniqueCategories.forEach(cat => createChip(cat, cat));
+        }
+
+        function applyFilters() {
+            let filtered = products;
+            if (activeCategory !== 'all') filtered = filtered.filter(p => p.category === activeCategory);
+            const term = searchInput.value.toLowerCase();
+            if (term) filtered = filtered.filter(p => (p.name && p.name.toLowerCase().includes(term)) || (p.category && p.category.toLowerCase().includes(term)));
+            renderProducts(filtered);
+        }
+
+        function renderProducts(items) {
+            productList.innerHTML = '';
+            if (items.length === 0) {
+                productList.parentElement.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+            } else {
+                productList.parentElement.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+                
+                // နောက်ဆုံးထည့်ထားတာက အပေါ်ဆုံးမှာပေါ်အောင် Reverse လုပ်ပါမယ်
+                [...items].reverse().forEach(p => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-blue-50/50 transition-colors";
+                    tr.innerHTML = `
+                        <td class="font-bold text-gray-800">
+                            ${p.name || '-'}
+                            <div class="sm:hidden text-[10px] text-gray-400 font-normal mt-0.5">${p.category || '-'}</div>
+                        </td>
+                        <td class="hidden sm:table-cell"><span class="text-[10px] bg-gray-100 text-gray-600 px-2 py-1 rounded-md font-medium">${p.category || '-'}</span></td>
+                        <td class="text-right font-bold text-blue-600">${Number(p.price || 0).toLocaleString()} <span class="text-[10px] text-gray-400 font-normal">Ks</span></td>
+                        <td class="text-right">
+                            <button onclick="deleteProduct('${p.id}')" class="w-8 h-8 rounded-full bg-red-50 text-red-400 hover:bg-red-100 hover:text-red-600 transition flex items-center justify-center ml-auto">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </button>
+                        </td>
+                    `;
+                    productList.appendChild(tr);
+                });
+            }
+            totalItems.innerText = `${toMyanmarNumber(items.length)} မျိုး`;
+        }
+
+        // Data အသစ် ထည့်သွင်းခြင်း (POST)
+        productForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> သိမ်းနေသည်';
+
+            const newProduct = {
+                data: [
+                    {
+                        id: Date.now().toString(),
+                        name: document.getElementById('name').value,
+                        price: document.getElementById('price').value,
+                        category: document.getElementById('category').value
+                    }
+                ]
+            };
+
+            try {
+                const response = await fetch(SHEETDB_URL, {
+                    method: "POST",
+                    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newProduct)
+                });
+                
+                if (response.ok) {
+                    productForm.reset();
+                    toggleModal();
+                    await fetchProducts(); 
+                }
+            } catch (error) {
+                alert("အမှားအယွင်းရှိခဲ့သည်။ အင်တာနက်ချိတ်ဆက်မှုကို စစ်ဆေးပါ။");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "သိမ်းမည်";
+            }
+        });
+
+        // Data ဖျက်ခြင်း (DELETE)
+        async function deleteProduct(id) {
+            if(confirm("ဤစာရင်းကို ဖျက်ရန် သေချာပါသလား?")) {
+                loadingOverlay.classList.remove('hidden');
+                try {
+                    const response = await fetch(`${SHEETDB_URL}/id/${id}`, {
+                        method: "DELETE",
+                        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' }
+                    });
+                    
+                    if (response.ok) await fetchProducts();
+                } catch (error) {
+                    alert("ဖျက်ရာတွင် အမှားအယွင်းရှိခဲ့သည်။");
+                } finally {
+                    loadingOverlay.classList.add('hidden');
+                }
+            }
+        }
+
+        searchInput.addEventListener('input', applyFilters);
+        
+        // စတင်ချိန်တွင် Data လှမ်းခေါ်ရန်
+        fetchProducts();
+    </script>
+</body>
+</html>
+
+
+```
