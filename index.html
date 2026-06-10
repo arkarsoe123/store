@@ -5,17 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ကုန်ပစ္စည်းဈေးနှုန်း</title>
     
-    <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#2563eb">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Prices">
     
-    <!-- Apple Touch Icon -->
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3514/3514491.png">
     
-    <!-- Dynamic Manifest Link -->
     <link rel="manifest" id="manifest-link" href="">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -32,14 +29,12 @@
 </head>
 <body class="bg-gray-100 min-h-screen pb-10">
 
-    <!-- Navbar -->
     <nav class="bg-blue-600 text-white shadow-md p-3 sticky top-0 z-20">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <h1 class="font-bold text-lg flex items-center">
-                <i class="fas fa-box-open mr-2"></i> ဦးမောင်လွင်ကုန်ပစ္စည်းစာရင်း
+                <i class="fas fa-box-open mr-2"></i> ကုန်ပစ္စည်းစာရင်း
             </h1>
             <div class="flex gap-2">
-                <!-- PWA Install Button -->
                 <button id="installBtn" class="hidden bg-white/20 text-white px-3 py-1.5 rounded-xl text-sm font-bold hover:bg-white/30 transition flex items-center">
                     <i class="fas fa-download mr-1.5"></i> App သွင်းမည်
                 </button>
@@ -50,9 +45,7 @@
         </div>
     </nav>
 
-    <!-- Main Container -->
     <div class="max-w-4xl mx-auto p-3">
-        <!-- Search & Filter -->
         <div class="flex gap-2 mb-3">
             <div class="relative flex-1">
                 <input type="text" id="searchInput" placeholder="အမည် သို့မဟုတ် အမျိုးအစားဖြင့် ရှာပါ..." class="w-full rounded-2xl border-gray-200 shadow-sm focus:ring-2 focus:ring-blue-500 border p-3 pl-10 outline-none text-sm bg-white">
@@ -63,12 +56,9 @@
             </div>
         </div>
 
-        <!-- Category Chips -->
         <div class="mb-3 flex gap-2 overflow-x-auto hide-scrollbar py-1" id="categoryBar"></div>
 
-        <!-- Product Table Card -->
         <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden relative">
-            <!-- Loading Overlay -->
             <div id="loadingOverlay" class="absolute inset-0 bg-white/85 backdrop-blur-sm flex items-center justify-center z-10 hidden">
                 <div class="text-center">
                     <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto mb-2"></div>
@@ -88,7 +78,6 @@
                 <tbody id="productList" class="divide-y divide-gray-100 text-sm"></tbody>
             </table>
             
-            <!-- Empty State -->
             <div id="emptyState" class="hidden text-center py-16">
                 <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3 text-gray-400 text-2xl">
                     <i class="fas fa-box-open"></i>
@@ -98,7 +87,6 @@
         </div>
     </div>
 
-    <!-- Product Form Modal (Add / Edit) -->
     <div id="formModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none modal transition-all duration-200">
         <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onclick="closeFormModal()"></div>
         <div class="bg-white w-full max-w-sm mx-4 p-5 rounded-2xl shadow-2xl relative z-10 max-h-[90vh] overflow-y-auto">
@@ -136,8 +124,8 @@
 
                 <div class="grid grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">ဝယ်ဈေး (Ks)</label>
-                        <input type="number" id="formBuyPrice" required placeholder="ဝယ်ရင်းဈေး" class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white border p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition text-sm">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">ဝယ်ဈေး (Ks) <span class="text-gray-400 font-normal"></span></label>
+                        <input type="number" id="formBuyPrice" placeholder="ဝယ်ရင်းဈေး" class="w-full rounded-xl border-gray-200 bg-gray-50 focus:bg-white border p-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 mb-1">ရောင်းဈေး (Ks)</label>
@@ -153,7 +141,6 @@
         </div>
     </div>
 
-    <!-- Product Detail Modal -->
     <div id="detailModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none modal transition-all duration-200">
         <div class="absolute inset-0 bg-gray-900/50 backdrop-blur-sm" onclick="closeDetailModal()"></div>
         <div class="bg-white w-full max-w-sm mx-4 p-6 rounded-2xl shadow-2xl relative z-10">
@@ -162,10 +149,8 @@
             </h2>
             
             <div id="detailContent" class="space-y-4">
-                <!-- Content will be injected here dynamically -->
-            </div>
+                </div>
 
-            <!-- Action Buttons inside detail view -->
             <div class="grid grid-cols-3 gap-2 mt-6 border-t pt-4">
                 <button onclick="editFromDetail()" class="bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-1">
                     <i class="fas fa-edit"></i> ပြင်ဆင်ရန်
@@ -229,7 +214,7 @@
 
         let products = [];
         let activeCategory = 'all';
-        let selectedProduct = null; // Detail Modal ထဲတွင် ရွေးထားသော Product
+        let selectedProduct = null;
 
         const productForm = document.getElementById('productForm');
         const productList = document.getElementById('productList');
@@ -247,7 +232,6 @@
             document.getElementById('formModalTitle').innerHTML = `<i class="fas fa-plus-circle text-blue-500 mr-2"></i> စာရင်းအသစ်`;
             document.getElementById('editProductId').value = '';
             productForm.reset();
-            // Default ကို ယနေ့ရက်စွဲ ထည့်ထားမည်
             document.getElementById('formDate').value = new Date().toISOString().split('T')[0];
             
             formModal.classList.remove('opacity-0', 'pointer-events-none');
@@ -264,11 +248,16 @@
         function openDetailModal(product) {
             selectedProduct = product;
             
-            // Format တွက်ချက်ခြင်းများ
-            const buyVal = Number(product.buy_price || 0);
+            const hasBuyPrice = product.buy_price && product.buy_price.trim() !== "";
+            const buyVal = hasBuyPrice ? Number(product.buy_price) : 0;
             const sellVal = Number(product.price || 0);
             const profitVal = sellVal - buyVal;
             
+            // ဝယ်ဈေးမရှိလျှင် ပြသရမည့်စာသား ပြင်ဆင်ခြင်း
+            const buyPriceHtml = hasBuyPrice ? `${buyVal.toLocaleString()} Ks` : `<span class="text-gray-400 font-normal text-xs italic">မသတ်မှတ်ထားပါ</span>`;
+            const profitHtml = hasBuyPrice ? `+${profitVal.toLocaleString()} Ks` : `<span class="text-gray-400 font-normal text-xs italic">တွက်ချက်မရပါ</span>`;
+            const profitClass = hasBuyPrice ? "text-emerald-600 font-bold" : "text-gray-400";
+
             const detailContent = document.getElementById('detailContent');
             detailContent.innerHTML = `
                 <div class="space-y-3">
@@ -291,7 +280,7 @@
                     <div class="grid grid-cols-2 gap-2 border-t border-b py-3 my-2">
                         <div>
                             <span class="text-xs font-bold text-gray-400 block">ဝယ်ယူသည့်ဈေး</span>
-                            <span class="text-base font-bold text-gray-600">${buyVal.toLocaleString()} Ks</span>
+                            <span class="text-base font-bold text-gray-600">${buyPriceHtml}</span>
                         </div>
                         <div>
                             <span class="text-xs font-bold text-gray-400 block">ရောင်းချသည့်ဈေး</span>
@@ -302,7 +291,7 @@
                     <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl">
                         <div>
                             <span class="text-xs font-bold text-gray-500 block">ခန့်မှန်းအမြတ်ငွေ</span>
-                            <span class="text-sm font-bold text-emerald-600">+${profitVal.toLocaleString()} Ks</span>
+                            <span class="text-sm ${profitClass}">${profitHtml}</span>
                         </div>
                         <div class="text-right">
                             <span class="text-xs font-bold text-gray-400 block">စာရင်းသွင်းရက်စွဲ</span>
@@ -322,7 +311,6 @@
             selectedProduct = null;
         }
 
-        // မြန်မာဂဏန်းပြောင်းနည်း
         const toMyanmarNumber = (num) => {
             const numbers = {'0':'၀','1':'၁','2':'၂','3':'၃','4':'၄','5':'၅','6':'၆','7':'၇','8':'၈','9':'၉'};
             return num.toString().replace(/[0-9]/g, match => numbers[match]);
@@ -345,7 +333,6 @@
             }
         }
 
-        // အမျိုးအစားခွဲများ ဖန်တီးပြသခြင်း
         function renderCategoryChips() {
             categoryBar.innerHTML = '';
             const uniqueCategories = [...new Set(products.map(p => p.category))].filter(Boolean);
@@ -362,7 +349,6 @@
             uniqueCategories.forEach(cat => createChip(cat, cat));
         }
 
-        // Filter စစ်ထုတ်ခြင်း
         function applyFilters() {
             let filtered = products;
             if (activeCategory !== 'all') filtered = filtered.filter(p => p.category === activeCategory);
@@ -377,7 +363,6 @@
             renderProducts(filtered);
         }
 
-        // ဇယားထဲသို့ Data များ ထည့်သွင်းဆွဲပြခြင်း
         function renderProducts(items) {
             productList.innerHTML = '';
             if (items.length === 0) {
@@ -387,12 +372,9 @@
                 productList.parentElement.classList.remove('hidden');
                 emptyState.classList.add('hidden');
                 
-                // နောက်ဆုံးသွင်းထားတာ အပေါ်ဆုံးပြရန် (Reverse Order)
                 [...items].reverse().forEach(p => {
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-blue-50/40 cursor-pointer transition-colors";
-                    
-                    // တစ်ခုချင်းစီကို နှိပ်လိုက်ရင် အသေးစိတ်ပွင့်ရန်
                     tr.onclick = () => openDetailModal(p);
                     
                     tr.innerHTML = `
@@ -425,14 +407,13 @@
 
             const nameVal = document.getElementById('formName').value;
             const priceVal = document.getElementById('formSellPrice').value;
-            const buyPriceVal = document.getElementById('formBuyPrice').value;
+            const buyPriceVal = document.getElementById('formBuyPrice').value; // ကွက်လပ်ဖြစ်နိုင်သည်
             const categoryVal = document.getElementById('formCategory').value;
             const brandVal = document.getElementById('formBrand').value;
             const dateVal = document.getElementById('formDate').value;
 
             try {
                 if (editId) {
-                    // Update စနစ် (PUT)
                     const response = await fetch(`${SHEETDB_URL}/id/${editId}`, {
                         method: "PUT",
                         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
@@ -453,7 +434,6 @@
                         await fetchProducts();
                     }
                 } else {
-                    // အသစ်ထည့်စနစ် (POST)
                     const response = await fetch(SHEETDB_URL, {
                         method: "POST",
                         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
@@ -486,11 +466,9 @@
             }
         });
 
-        // Detail ထဲမှ ပြင်ဆင်ရန် နှိပ်သည့်အခါ
         function editFromDetail() {
             if (!selectedProduct) return;
             
-            // Edit Form ထဲ အချက်အလက်များ ဖြည့်စွက်ပေးခြင်း
             document.getElementById('formModalTitle').innerHTML = `<i class="fas fa-edit text-amber-500 mr-2"></i> စာရင်းပြင်ဆင်ရန်`;
             document.getElementById('editProductId').value = selectedProduct.id;
             document.getElementById('formDate').value = selectedProduct.date || new Date().toISOString().split('T')[0];
@@ -500,13 +478,11 @@
             document.getElementById('formBuyPrice').value = selectedProduct.buy_price || '';
             document.getElementById('formSellPrice').value = selectedProduct.price || '';
 
-            // Detail Modal ပိတ်ပြီး Form Modal ဖွင့်ရန်
             closeDetailModal();
             formModal.classList.remove('opacity-0', 'pointer-events-none');
             document.body.classList.add('modal-active');
         }
 
-        // Detail ထဲမှ ဖျက်ရန် နှိပ်သည့်အခါ
         async function deleteFromDetail() {
             if (!selectedProduct) return;
             
@@ -536,8 +512,6 @@
         }
 
         searchInput.addEventListener('input', applyFilters);
-        
-        // App စတင်သည်နှင့် Data ကို ဆွဲယူမည်
         fetchProducts();
     </script>
 </body>
